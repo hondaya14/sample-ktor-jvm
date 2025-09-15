@@ -13,6 +13,7 @@ import org.jetbrains.exposed.sql.*
 
 fun Application.configureRouting() {
     routing {
+        swaggerUI(path = "swagger", swaggerFile = "openapi/documentation.yaml")
         get("/") {
             call.respondText("Hello World!")
         }
