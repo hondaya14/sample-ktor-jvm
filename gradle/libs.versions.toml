@@ -3,6 +3,7 @@ exposed = "0.61.0"
 h2 = "2.3.232"
 kotlin = "2.2.10"
 ktor = "3.2.3"
+swagger = "1.0.57"
 logback = "1.4.14"
 
 [libraries]
@@ -14,6 +15,7 @@ exposed-jdbc = { module = "org.jetbrains.exposed:exposed-jdbc", version.ref = "e
 h2 = { module = "com.h2database:h2", version.ref = "h2" }
 ktor-server-swagger = { module = "io.ktor:ktor-server-swagger", version.ref = "ktor" }
 ktor-server-openapi = { module = "io.ktor:ktor-server-openapi", version.ref = "ktor" }
+swagger-code-generator = { module = "io.swagger.codegen.v3:swagger-codegen-generators", version.ref = "swagger" }
 ktor-server-netty = { module = "io.ktor:ktor-server-netty", version.ref = "ktor" }
 logback-classic = { module = "ch.qos.logback:logback-classic", version.ref = "logback" }
 ktor-server-config-yaml = { module = "io.ktor:ktor-server-config-yaml", version.ref = "ktor" }

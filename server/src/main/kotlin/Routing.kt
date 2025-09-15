@@ -9,11 +9,14 @@ import io.ktor.server.plugins.swagger.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import org.jetbrains.exposed.sql.*
+import io.swagger.codegen.v3.generators.html.StaticHtmlCodegen
 
 fun Application.configureRouting() {
     routing {
         swaggerUI(path = "swagger", swaggerFile = "openapi/documentation.yaml")
+        openAPI(path = "openapi", swaggerFile = "openapi/documentation.yaml"){
+            codegen = StaticHtmlCodegen()
+        }
         get("/") {
             call.respondText("Hello World!")
         }

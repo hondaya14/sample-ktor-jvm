@@ -17,6 +17,7 @@ dependencies {
     implementation(libs.h2)
     implementation(libs.ktor.server.swagger)
     implementation(libs.ktor.server.openapi)
+    implementation(libs.swagger.code.generator)
     implementation(libs.ktor.server.netty)
     implementation(libs.logback.classic)
     implementation(libs.ktor.server.config.yaml)
