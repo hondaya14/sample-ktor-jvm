@@ -1,6 +1,16 @@
 ktor:
-    application:
-        modules:
-            - co.hondaya.ApplicationKt.module
-    deployment:
-        port: 8080
+  deployment:
+    port: 8080
+    development: true
+  application:
+    modules:
+      - co.hondaya.ApplicationKt.module
+
+redis:
+  cluster:
+    nodes:
+      - "172.28.0.11:6379"
+      - "172.28.0.12:6379"
+      - "172.28.0.13:6379"
+  ssl: false
+  timeoutMs: 2000
