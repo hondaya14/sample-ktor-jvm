@@ -1,15 +1,10 @@
 package co.hondaya
 
-import config.Config
 import io.ktor.server.application.Application
 import io.ktor.server.application.ApplicationStopped
 import io.ktor.server.application.log
 import io.ktor.server.config.ApplicationConfig
-import io.ktor.server.config.ConfigLoader
-import io.ktor.server.config.HoconApplicationConfig
-import io.ktor.server.config.HoconConfigLoader
-import io.ktor.server.config.tryGetStringList
-import io.ktor.server.engine.EmbeddedServer
+// Using ApplicationConfig member APIs (config/configOrNull/property/propertyOrNull)
 import io.ktor.util.AttributeKey
 import io.lettuce.core.RedisURI
 import io.lettuce.core.cluster.RedisClusterClient
@@ -28,12 +23,17 @@ data class RedisConfig(
 
     companion object {
         fun from(config: ApplicationConfig): RedisConfig {
+            val redisCfg = config.config("redis")
+            val clusterCfg = redisCfg.config("cluster")
+
+            val nodes = clusterCfg.property("nodes").getList()
+            val ssl = redisCfg.propertyOrNull("ssl")?.getString()?.toBooleanStrictOrNull() ?: false
+            val timeoutMs = redisCfg.propertyOrNull("timeoutMs")?.getString()?.toLongOrNull() ?: 2000L
+
             return RedisConfig(
-                cluster = Cluster(
-                    nodes = config.config("redis").property("cluster.nodes").getList()
-                ),
-                ssl = config.property("redis.ssl").getString().toBoolean(),
-                timeoutMs = config.property("redis.timeoutMs").getString().toLong()
+                cluster = Cluster(nodes = nodes),
+                ssl = ssl,
+                timeoutMs = timeoutMs,
             )
         }
     }
@@ -51,42 +51,45 @@ data class RedisResource(
 private val RedisResourcesKey = AttributeKey<RedisResource>(name = RedisResource.KEY)
 
 fun Application.configureRedisCluster() {
-    val redisConf = environment.config.config("redis")
-    println(redisConf)
-    val clusterConf = redisConf.config("cluster")
-    println(clusterConf)
-    val nodes = clusterConf.property("nodes").getList()   // ["127.0.0.1:6379", ...]
-    val ssl = redisConf.property("ssl").getString()
-    println("aaa: $redisConf, $clusterConf, $nodes, $ssl")
-    val redisConfig = RedisConfig.from(config = environment.config)
-    val uris = redisConfig.cluster.nodes.map { hostPort ->
-        val parts = hostPort.split(":", limit = 2)
-        val host = parts[0]
-        val port = parts.getOrNull(1)?.toIntOrNull() ?: 6379
-        val builder = RedisURI.Builder.redis(host, port).apply {
-            withTimeout(Duration.ofMillis(redisConfig.timeoutMs))
-            withSsl(redisConfig.ssl)
-        }
-        builder.build()
-    }
+    log.info("redis: try connection...")
 
-    val client = RedisClusterClient.create(uris)
-    val connection = client.connect()
-    log.info("Connected to Redis cluster; ping responded: ${connection.sync().ping()}")
+    val redisUri: RedisURI = RedisURI.Builder.redis("127.0.0.1", 6381).build();
+    val client = RedisClusterClient.create(redisUri)
+    val connection = client.connect();
 
     attributes.put(RedisResourcesKey, RedisResource(client = client, connection = connection))
 
-    // Close on shutdown
-//    EmbeddedServer.monitor.subscribe(definition = ApplicationStopped) {
-//        runCatching {
-//            connection.close()
-//            client.shutdown()
-//        }
-//        log.info("Redis cluster connection closed")
+//    val uris = cfg.cluster.nodes.map { node ->
+//        val parts = node.split(":", limit = 2)
+//        val host = parts.getOrNull(0)?.trim().orEmpty()
+//        val port = parts.getOrNull(1)?.toIntOrNull() ?: 6379
+//
+//        val builder = RedisURI.Builder.redis(host, port)
+//            .withTimeout(Duration.ofMillis(cfg.timeoutMs))
+//        if (cfg.ssl) builder.withSsl(true)
+//        builder.build()
 //    }
+//
+//    val client = RedisClusterClient.create(uris)
+//    val connection = client.connect()
+//
+//    attributes.put(RedisResourcesKey, RedisResource(client = client, connection = connection))
+//
+//    log.info("Redis cluster configured with ${uris.size} node(s); ssl=${cfg.ssl}; timeoutMs=${cfg.timeoutMs}")
+//
+    environment.monitor.subscribe(ApplicationStopped) {
+        runCatching {
+            val resource = if (attributes.contains(RedisResourcesKey)) attributes[RedisResourcesKey] else null
+            resource?.let {
+                it.connection.close()
+                it.client.shutdown()
+            }
+        }.onFailure {
+            log.warn("Error closing Redis resources: ${it.message}", it)
+        }
+    }
 }
 
 /** Accessor for later use if needed in routes/services. */
 val Application.redisClient: RedisAdvancedClusterCommands<String, String>
     get() = attributes[RedisResourcesKey].connection.sync()
-

@@ -28,7 +28,8 @@ fun Application.configureRouting() {
         }
         get("/cache/{key}") {
             val key = call.parameters.get("key")
-            application.redisClient.get(key)
+            val value = application.redisClient.get(key)
+            call.respondText(value)
         }
     }
 }

@@ -5,7 +5,8 @@ plugins {
 }
 
 application {
-    mainClass = "co.hondaya.ApplicationKt"
+    // Use Ktor EngineMain so application.yaml is loaded automatically
+    mainClass = "io.ktor.server.netty.EngineMain"
 }
 
 dependencies {
