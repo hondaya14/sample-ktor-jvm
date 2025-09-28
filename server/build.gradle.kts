@@ -1,3 +1,5 @@
+import io.ktor.plugin.KtorGradlePlugin
+
 plugins {
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.ktor)
@@ -30,4 +32,22 @@ dependencies {
     implementation(libs.ktor.server.config.yaml)
     testImplementation(libs.ktor.server.test.host)
     testImplementation(libs.kotlin.test.junit)
+}
+
+
+val dockerComposeFilePath = "./docker-compose.yaml"
+tasks.register<Exec>("dockerComposeUp") {
+    group = "docker"
+    workingDir = rootProject.projectDir
+    commandLine("sh", "-c", "docker compose -f $dockerComposeFilePath up -d")
+}
+
+tasks.register<Exec>("dockerComposeDown") {
+    group = "docker"
+    workingDir = rootProject.projectDir
+    commandLine("sh", "-c", "docker compose -f $dockerComposeFilePath down --rmi local --remove-orphans --volumes")
+}
+
+tasks.named("run") {
+    dependsOn("dockerComposeUp")
 }
