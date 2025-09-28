@@ -9,25 +9,26 @@ import io.ktor.server.plugins.swagger.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import io.ktor.server.util.getOrFail
 import io.swagger.codegen.v3.generators.html.StaticHtmlCodegen
-import kotlinx.coroutines.withContext
+import redisClient
 
 fun Application.configureRouting() {
     routing {
         swaggerUI(path = "swagger", swaggerFile = "openapi/documentation.yaml")
-        openAPI(path = "openapi", swaggerFile = "openapi/documentation.yaml"){
+        openAPI(path = "openapi", swaggerFile = "openapi/documentation.yaml") {
             codegen = StaticHtmlCodegen()
         }
-        get("/") {
-            call.respondText("Hello World!")
+        get("/healthcheck") {
+            call.respondText("OK")
         }
         post("/cache/{key}") {
-            val key = call.parameters.get("key")
+            val key = call.parameters.getOrFail("key")
             val body = call.receive<String>()
             application.redisClient.set(key, body)
         }
         get("/cache/{key}") {
-            val key = call.parameters.get("key")
+            val key = call.parameters.getOrFail("key")
             val value = application.redisClient.get(key)
             call.respondText(value)
         }

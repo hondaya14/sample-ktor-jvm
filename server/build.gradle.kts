@@ -4,12 +4,18 @@ plugins {
     alias(libs.plugins.kotlin.plugin.serialization)
 }
 
+repositories {
+    mavenCentral()
+}
+
 application {
     // Use Ktor EngineMain so application.yaml is loaded automatically
     mainClass = "io.ktor.server.netty.EngineMain"
 }
 
 dependencies {
+    implementation(project(":domain"))
+    implementation(project(":infrastructure"))
     implementation(libs.ktor.server.core)
     implementation(libs.ktor.serialization.kotlinx.json)
     implementation(libs.ktor.server.content.negotiation)
@@ -22,7 +28,6 @@ dependencies {
     implementation(libs.ktor.server.netty)
     implementation(libs.logback.classic)
     implementation(libs.ktor.server.config.yaml)
-    implementation(libs.lettuce.core)
     testImplementation(libs.ktor.server.test.host)
     testImplementation(libs.kotlin.test.junit)
 }

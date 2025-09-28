@@ -1,16 +1,13 @@
-package co.hondaya
-
 import io.ktor.server.application.Application
 import io.ktor.server.application.ApplicationStopped
 import io.ktor.server.application.log
 import io.ktor.server.config.ApplicationConfig
-// Using ApplicationConfig member APIs (config/configOrNull/property/propertyOrNull)
 import io.ktor.util.AttributeKey
 import io.lettuce.core.RedisURI
 import io.lettuce.core.cluster.RedisClusterClient
 import io.lettuce.core.cluster.api.StatefulRedisClusterConnection
 import io.lettuce.core.cluster.api.sync.RedisAdvancedClusterCommands
-import java.time.Duration
+import kotlin.runCatching
 
 data class RedisConfig(
     val cluster: Cluster,
@@ -59,24 +56,6 @@ fun Application.configureRedisCluster() {
 
     attributes.put(RedisResourcesKey, RedisResource(client = client, connection = connection))
 
-//    val uris = cfg.cluster.nodes.map { node ->
-//        val parts = node.split(":", limit = 2)
-//        val host = parts.getOrNull(0)?.trim().orEmpty()
-//        val port = parts.getOrNull(1)?.toIntOrNull() ?: 6379
-//
-//        val builder = RedisURI.Builder.redis(host, port)
-//            .withTimeout(Duration.ofMillis(cfg.timeoutMs))
-//        if (cfg.ssl) builder.withSsl(true)
-//        builder.build()
-//    }
-//
-//    val client = RedisClusterClient.create(uris)
-//    val connection = client.connect()
-//
-//    attributes.put(RedisResourcesKey, RedisResource(client = client, connection = connection))
-//
-//    log.info("Redis cluster configured with ${uris.size} node(s); ssl=${cfg.ssl}; timeoutMs=${cfg.timeoutMs}")
-//
     environment.monitor.subscribe(ApplicationStopped) {
         runCatching {
             val resource = if (attributes.contains(RedisResourcesKey)) attributes[RedisResourcesKey] else null

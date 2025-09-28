@@ -1,15 +1,10 @@
 plugins {
-    kotlin("jvm")
-}
-
-group = "co.hondaya"
-version = "0.0.1"
-
-repositories {
-    mavenCentral()
+    alias(libs.plugins.kotlin.jvm)
 }
 
 dependencies {
+    implementation(libs.ktor.server.core)
+    api(libs.lettuce.core)
     testImplementation(kotlin("test"))
 }
 
