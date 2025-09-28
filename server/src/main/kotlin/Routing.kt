@@ -1,5 +1,3 @@
-package co.hondaya
-
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
@@ -11,7 +9,6 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.server.util.getOrFail
 import io.swagger.codegen.v3.generators.html.StaticHtmlCodegen
-import redisClient
 
 fun Application.configureRouting() {
     routing {

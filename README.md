@@ -42,3 +42,11 @@ If the server starts successfully, you'll see the following output:
 2024-12-04 14:32:45.682 [main] INFO  Application - Responding at http://0.0.0.0:8080
 ```
 
+## Static Analysis (Detekt)
+
+- Run all modules: `./gradlew detekt`
+- Auto-correct where possible: `./gradlew detekt -Pdetekt.autoCorrect=true`
+- Generate SARIF + TXT reports in each module under `build/reports/detekt/`.
+- Config lives at `config/detekt/detekt.yml` (shared across modules).
+
+Tip: Create a baseline with `./gradlew detektBaseline` if you want to ignore existing findings and focus on new code. The baseline file is not created by default.

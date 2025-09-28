@@ -1,5 +1,3 @@
-package co.hondaya
-
 import io.ktor.client.request.*
 import io.ktor.http.*
 import io.ktor.server.testing.*
@@ -17,5 +15,4 @@ class ApplicationTest {
             assertEquals(HttpStatusCode.OK, status)
         }
     }
-
 }
