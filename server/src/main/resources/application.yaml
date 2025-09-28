@@ -4,7 +4,7 @@ ktor:
     development: true
   application:
     modules:
-      - co.hondaya.ApplicationKt.module
+      - ApplicationKt.module
 
 redis:
   cluster:
