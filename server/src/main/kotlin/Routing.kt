@@ -19,12 +19,16 @@ fun Application.configureRouting() {
         get("/healthcheck") {
             call.respondText("OK")
         }
-        post("/cache/{key}") {
+        post("/caches/{key}") {
             val key = call.parameters.getOrFail("key")
             val body = call.receive<String>()
             application.redisClient.set(key, body)
         }
-        get("/cache/{key}") {
+        get("/caches") {
+            val value = application.redisClient.get(key)
+            call.respondText(value)
+        }
+        get("/caches/{key}") {
             val key = call.parameters.getOrFail("key")
             val value = application.redisClient.get(key)
             call.respondText(value)
