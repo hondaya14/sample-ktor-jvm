@@ -1,9 +1,7 @@
-import io.ktor.plugin.KtorGradlePlugin
-
 plugins {
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.ktor)
-    alias(libs.plugins.kotlin.plugin.serialization)
+    alias(libs.plugins.kotlin.serialization)
 }
 
 repositories {
@@ -17,10 +15,10 @@ application {
 
 dependencies {
     implementation(project(":domain"))
+    implementation(project(":usecase"))
     implementation(project(":infrastructure"))
-    implementation(libs.ktor.server.core)
-    implementation(libs.ktor.serialization.kotlinx.json)
-    implementation(libs.ktor.server.content.negotiation)
+    implementation(libs.bundles.ktor.server)
+    implementation(libs.ktor.server.call.logging)
     implementation(libs.exposed.core)
     implementation(libs.exposed.jdbc)
     implementation(libs.h2)
@@ -29,7 +27,6 @@ dependencies {
     implementation(libs.swagger.code.generator)
     implementation(libs.ktor.server.netty)
     implementation(libs.logback.classic)
-    implementation(libs.ktor.server.config.yaml)
     testImplementation(libs.ktor.server.test.host)
     testImplementation(libs.kotlin.test.junit)
 }
