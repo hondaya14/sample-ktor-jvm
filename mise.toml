@@ -1,2 +1,2 @@
 [tools]
-java = "adoptopenjdk-21.0.7+6.0.LTS"
+java = "adoptopenjdk-24.0.2+12"

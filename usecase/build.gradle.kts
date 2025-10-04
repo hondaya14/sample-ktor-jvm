@@ -1,12 +1,10 @@
 plugins {
     alias(libs.plugins.kotlin.jvm)
-    alias(libs.plugins.ktor)
 }
 
 dependencies {
     implementation(project(":domain"))
     implementation(libs.bundles.ktor.server)
-    api(libs.lettuce.core)
     testImplementation(kotlin("test"))
 }
 
